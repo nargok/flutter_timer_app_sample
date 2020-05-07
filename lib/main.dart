@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
 
 void main() => runApp(MyApp());
 
@@ -25,6 +26,8 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   static bool _isCounting = false;
+  static int _defaultSeconds = 5;
+  static int _seconds = _defaultSeconds;
 
   @override
   Widget build(BuildContext context) {
@@ -32,20 +35,23 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: SafeArea( // OSの標準ボタンとかぶらないように表示する
+      body: SafeArea(
+        // OSの標準ボタンとかぶらないように表示する
         child: Column(children: <Widget>[
-          Expanded( // めいいっぱい伸ばす
-            child:  Container(color: Colors.green)
-          ),
+          Expanded(
+              // めいいっぱい伸ばす
+              child: Center(
+                  child: Text(
+            _seconds.toString(),
+            style: TextStyle(fontSize: 100),
+          ))),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               RaisedButton(
                 child: Text(_isCounting ? 'STOP' : 'START'),
                 onPressed: () {
-                  setState(() {
-                    _isCounting = !_isCounting;
-                  });
+                  _handleTimer();
                 },
               ),
               Container(width: 30), // 余白
@@ -55,6 +61,9 @@ class _MyHomePageState extends State<MyHomePage> {
                   child: Text('RESET'),
                   onPressed: () {
                     print('RESET');
+                    setState(() {
+                      _seconds = _defaultSeconds;
+                    });
                   },
                 )
             ],
@@ -62,5 +71,31 @@ class _MyHomePageState extends State<MyHomePage> {
         ]),
       ),
     );
+  }
+
+  Timer _timer;
+
+  void _handleTimer() {
+    setState(() {
+      _isCounting = !_isCounting;
+    });
+
+    if (_isCounting) {
+      // 1秒ごとにカウントダウンする
+      _timer = Timer.periodic(Duration(seconds: 1), (_) {
+        setState(() {
+          _seconds--;
+        });
+        if (_seconds <= 0) {
+          // 完了
+
+          _timer.cancel();
+        }
+      });
+    } else {
+      // カウントをとめる
+      _timer.cancel();
+    }
+
   }
 }
