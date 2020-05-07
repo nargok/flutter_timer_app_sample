@@ -37,33 +37,23 @@ class _MyHomePageState extends State<MyHomePage> {
           title: Text(widget.title),
         ),
         body: SafeArea(
-          child: Column(
-            children: <Widget>[
-              Text('aaaa')
-            ],
-          ),
-          // OSの標準ボタンとかぶらないように表示する
-//          child: Column(children: <Widget>[
-//          Expanded(
-//          // めいいっぱい伸ばす
-//          child: Column(
-//              children: <Widget>[
-//
-//              Text(
-//              _seconds.toString(),
-//          style: TextStyle(fontSize: 100),
-//        ))],
-//    ),
-
-//              child: Center(
-//                  child: Text(
-//            _seconds.toString(),
-//            style: TextStyle(fontSize: 100),
-//          ))
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
+            // OS標準のボタンに被せないようにする
+            child: Column(children: <Widget>[
+          Expanded(
+              child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                Text(_seconds.toString(), style: TextStyle(fontSize: 100)),
+                if (!_isCounting)
+                  // 編集ボタン
+                  RaisedButton(
+                    child: Text('EDIT'),
+                    onPressed: () {
+                      _showEditDialog();
+                    },
+                  ),
+              ])),
+          Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
             RaisedButton(
               child: Text(_isCounting ? 'STOP' : 'START'),
               onPressed: () {
@@ -82,11 +72,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   });
                 },
               )
-          ],
-        )
-        ]),)
-    ,
-    );
+          ])
+        ])));
   }
 
   Timer _timer;
@@ -117,54 +104,60 @@ class _MyHomePageState extends State<MyHomePage> {
   void _showEditDialog() {
     int newSeconds = 0;
 
-    showDialog(context: context, builder: (context) {
-      return Dialog(
-        child: Container(
-          height: 400,
-          child: Column(
-            children: <Widget>[
+    showDialog(
+        context: context,
+        builder: (context) {
+          return Dialog(
+            child: Container(
+              height: 400,
+              child: Column(
+                children: <Widget>[
 //              Text('AAAAAA'),
-              // 時間設定のドラム
-              CupertinoTimerPicker( // iOSのタイムピッカーが優秀とのこと
-                initialTimerDuration: Duration(seconds: _defaultSeconds), // 初期値設定
-                mode: CupertinoTimerPickerMode.ms,
-                onTimerDurationChanged: (Duration duration) {
-                  print(duration);
-                  newSeconds = duration.inSeconds; // 秒単位で取得する
-                },
+                  // 時間設定のドラム
+                  CupertinoTimerPicker(
+                    // iOSのタイムピッカーが優秀とのこと
+                    initialTimerDuration: Duration(seconds: _defaultSeconds),
+                    // 初期値設定
+                    mode: CupertinoTimerPickerMode.ms,
+                    onTimerDurationChanged: (Duration duration) {
+                      print(duration);
+                      newSeconds = duration.inSeconds; // 秒単位で取得する
+                    },
+                  ),
+                  // 決定ボタン
+                  RaisedButton(
+                    child: Text('SAVE'),
+                    onPressed: () {
+                      setState(() {
+                        _defaultSeconds = newSeconds;
+                        _seconds = _defaultSeconds;
+                      });
+                      Navigator.pop(context);
+                    },
+                  )
+                ],
               ),
-              // 決定ボタン
+            ),
+          );
+        });
+  }
+
+  void _showFinishedDialog() {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text('タイマー終了'),
+            content: Text('完了しました'),
+            actions: <Widget>[
               RaisedButton(
-                child: Text('SAVE'),
+                child: Text('OK'),
                 onPressed: () {
-                  setState(() {
-                    _defaultSeconds = newSeconds;
-                    _seconds = _defaultSeconds;
-                  });
                   Navigator.pop(context);
                 },
               )
             ],
-          ),
-        ),
-      );
-    });
-  }
-
-  void _showFinishedDialog() {
-    showDialog(context: context, builder: (context) {
-      return AlertDialog(
-        title: Text('タイマー終了'),
-        content: Text('完了しました'),
-        actions: <Widget>[
-          RaisedButton(
-            child: Text('OK'),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          )
-        ],
-      );
-    });
+          );
+        });
   }
 }
