@@ -87,8 +87,8 @@ class _MyHomePageState extends State<MyHomePage> {
           _seconds--;
         });
         if (_seconds <= 0) {
-          // 完了
-
+          // 完了dialog
+          _showFinishedDialog();
           _timer.cancel();
         }
       });
@@ -96,6 +96,22 @@ class _MyHomePageState extends State<MyHomePage> {
       // カウントをとめる
       _timer.cancel();
     }
+  }
 
+  void _showFinishedDialog() {
+    showDialog(context: context, builder: (context) {
+      return AlertDialog(
+        title: Text('タイマー終了'),
+        content: Text('完了しました'),
+        actions: <Widget>[
+          RaisedButton(
+            child: Text('OK'),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          )
+        ],
+      );
+    });
   }
 }
