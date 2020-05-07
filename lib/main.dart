@@ -24,7 +24,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-
   static bool _isCounting = false;
 
   @override
@@ -33,26 +32,34 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: Center(
-        child: Row(
-          children: <Widget>[
-            RaisedButton(
-              child: Text( _isCounting ? 'STOP' : 'START'),
-              onPressed: () {
-                setState(() {
-                  _isCounting = !_isCounting;
-                });
-              },
-            ),
-            Container(width: 30),
-            RaisedButton(
-              child: Text('RESET'),
-              onPressed: () {
-                print('RESET');
-              },
-            )
-          ],
-        )
+      body: SafeArea( // OSの標準ボタンとかぶらないように表示する
+        child: Column(children: <Widget>[
+          Expanded( // めいいっぱい伸ばす
+            child:  Container(color: Colors.green)
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              RaisedButton(
+                child: Text(_isCounting ? 'STOP' : 'START'),
+                onPressed: () {
+                  setState(() {
+                    _isCounting = !_isCounting;
+                  });
+                },
+              ),
+              Container(width: 30), // 余白
+
+              if (!_isCounting)
+                RaisedButton(
+                  child: Text('RESET'),
+                  onPressed: () {
+                    print('RESET');
+                  },
+                )
+            ],
+          )
+        ]),
       ),
     );
   }
