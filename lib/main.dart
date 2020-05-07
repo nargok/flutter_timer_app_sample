@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
+import 'package:flutter/cupertino.dart';
 
 void main() => runApp(MyApp());
 
@@ -32,44 +33,59 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: SafeArea(
-        // OSの標準ボタンとかぶらないように表示する
-        child: Column(children: <Widget>[
-          Expanded(
-              // めいいっぱい伸ばす
-              child: Center(
-                  child: Text(
-            _seconds.toString(),
-            style: TextStyle(fontSize: 100),
-          ))),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+        appBar: AppBar(
+          title: Text(widget.title),
+        ),
+        body: SafeArea(
+          child: Column(
             children: <Widget>[
-              RaisedButton(
-                child: Text(_isCounting ? 'STOP' : 'START'),
-                onPressed: () {
-                  _handleTimer();
-                },
-              ),
-              Container(width: 30), // 余白
-
-              if (!_isCounting)
-                RaisedButton(
-                  child: Text('RESET'),
-                  onPressed: () {
-                    print('RESET');
-                    setState(() {
-                      _seconds = _defaultSeconds;
-                    });
-                  },
-                )
+              Text('aaaa')
             ],
-          )
-        ]),
-      ),
+          ),
+          // OSの標準ボタンとかぶらないように表示する
+//          child: Column(children: <Widget>[
+//          Expanded(
+//          // めいいっぱい伸ばす
+//          child: Column(
+//              children: <Widget>[
+//
+//              Text(
+//              _seconds.toString(),
+//          style: TextStyle(fontSize: 100),
+//        ))],
+//    ),
+
+//              child: Center(
+//                  child: Text(
+//            _seconds.toString(),
+//            style: TextStyle(fontSize: 100),
+//          ))
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            RaisedButton(
+              child: Text(_isCounting ? 'STOP' : 'START'),
+              onPressed: () {
+                _handleTimer();
+              },
+            ),
+            Container(width: 30), // 余白
+
+            if (!_isCounting)
+              RaisedButton(
+                child: Text('RESET'),
+                onPressed: () {
+                  print('RESET');
+                  setState(() {
+                    _seconds = _defaultSeconds;
+                  });
+                },
+              )
+          ],
+        )
+        ]),)
+    ,
     );
   }
 
@@ -96,6 +112,43 @@ class _MyHomePageState extends State<MyHomePage> {
       // カウントをとめる
       _timer.cancel();
     }
+  }
+
+  void _showEditDialog() {
+    int newSeconds = 0;
+
+    showDialog(context: context, builder: (context) {
+      return Dialog(
+        child: Container(
+          height: 400,
+          child: Column(
+            children: <Widget>[
+//              Text('AAAAAA'),
+              // 時間設定のドラム
+              CupertinoTimerPicker( // iOSのタイムピッカーが優秀とのこと
+                initialTimerDuration: Duration(seconds: _defaultSeconds), // 初期値設定
+                mode: CupertinoTimerPickerMode.ms,
+                onTimerDurationChanged: (Duration duration) {
+                  print(duration);
+                  newSeconds = duration.inSeconds; // 秒単位で取得する
+                },
+              ),
+              // 決定ボタン
+              RaisedButton(
+                child: Text('SAVE'),
+                onPressed: () {
+                  setState(() {
+                    _defaultSeconds = newSeconds;
+                    _seconds = _defaultSeconds;
+                  });
+                  Navigator.pop(context);
+                },
+              )
+            ],
+          ),
+        ),
+      );
+    });
   }
 
   void _showFinishedDialog() {
